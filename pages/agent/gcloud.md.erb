@@ -1,6 +1,6 @@
 # Running Buildkite Agent on Google Cloud Platform
 
-The Buildkite Agent can be run on [Google Cloud Platform](https://cloud.google.com). For fine control over long–lived agents, you might like to run the agent using individual VM instances on Google Compute Engine. Or run Docker–based builds using a scalable cluster of agents on the Google Container Engine.
+The Buildkite Agent can be run on [Google Cloud Platform](https://cloud.google.com). For fine control over long–lived agents, you can to run the agent using individual VM instances on Google Compute Engine. Or run Docker–based builds using a scalable cluster of agents on the Google Container Engine.
 
 <%= toc %>
 
@@ -16,21 +16,21 @@ Connect via SSH:
 
 <%= image "ssh-to-instance.png", size: "2048x1220", alt: "Screenshot of connecting to a Google Compute Engine instance via the Google Cloud Console" %>
 
-Now follow the [setup instructions for Ubuntu](/docs/agent/ubuntu).
+Follow the [agent setup instructions for Ubuntu](/docs/agent/ubuntu).
 
 ## Running the agent on Google Container Engine
 
-[Google Container Engine](https://cloud.google.com/container-engine) can run the agent as a [Docker](https://www.docker.com) container using [Kubernetes](https://kubernetes.io). If you wish to [run Docker–based builds](/docs/builds/docker-containerized-builds), ensure the container is started with a [privileged security context](https://kubernetes.io/docs/user-guide/pods/#privileged-mode-for-pod-containers) and mount the the Docker socket and binary as volumes. For example:
+[Google Container Engine](https://cloud.google.com/container-engine) can run the agent as a [Docker](https://www.docker.com) container using [Kubernetes](https://kubernetes.io). To [run Docker–based builds](/docs/builds/docker-containerized-builds), ensure the container is started with a [privileged security context](https://kubernetes.io/docs/user-guide/pods/#privileged-mode-for-pod-containers) and mount the the Docker socket and binary as volumes. For example:
 
 Start a Google Container Engine cluster [through the console](https://console.cloud.google.com/kubernetes/add):
 
 <%= image "create-a-cluster.png", size: "2048x1216", alt: "Screenshot of creating a Google Container Engine cluster via the Google Cloud Console" %>
 
-Open [Google Cloud Shell](https://cloud.google.com/shell/) or your own console with [gcloud](https://cloud.google.com/sdk/gcloud/) installed and authenticated. You'll need to configure kubectl to talk to your new cluster. The console includes a "Connect" button which shows the exact command to run:
+Open [Google Cloud Shell](https://cloud.google.com/shell/), or your own console with [gcloud](https://cloud.google.com/sdk/gcloud/) installed and authenticated. You'll need to configure kubectl to talk to your new cluster. The console includes a "Connect" button which shows the exact command to run:
 
 <%= image "connect-to-cluster.png", size: "2048x1216", alt: "Screenshot of cluster connection settings in the Google Cloud Console" %>
 
-Running it should look a bit like this, with your details in the right places:
+Running it should look like this, with your details:
 
 ```shell
 $ gcloud container clusters get-credentials INSERT-YOUR-CLUSTER-NAME \
@@ -144,7 +144,7 @@ buildkite-agent-3220167863-9psz9   1/1       Running   0          24s
 buildkite-agent-3220167863-m3nm2   1/1       Running   0          24s
 ```
 
-To run builds from private repositories you may want to store [an SSH key for the agent](/docs/agent/ssh-keys) in a secret and map it into the containers:
+To run builds from private repositories you can store [an SSH key for the agent](/docs/agent/ssh-keys) in a secret and map it into the containers:
 
 ```shell
 # Use an existing keypair, or generate a new one with something like:
@@ -185,7 +185,7 @@ spec:
   ...
 ```
 
-To [configure](/docs/agent/configuration) the agent further you might like to create a [config map](https://kubernetes.io/docs/user-guide/configmap/) and volume mount it over the default agent configuration file in `/buildkite/buildkite-agent.cfg`.
+To [configure](/docs/agent/configuration) the agent further you can add more environment variables or create a [config map](https://kubernetes.io/docs/user-guide/configmap/) and volume mount it over the default agent configuration file in `/buildkite/buildkite-agent.cfg`.
 
 To add [agent hooks](/docs/agent/hooks) you can also use a config map and volume mount them into `/buildkite/hooks/`.
 
@@ -193,10 +193,10 @@ See [our Docker setup instructions](/docs/agent/docker) for more details on conf
 
 ## Uploading artifacts to Google Cloud Storage
 
-You can upload [artifacts](/docs/builds/artifacts) created by your builds to your own [Google Cloud Storage](https://cloud.google.com/storage) bucket. Configure the agent to target your bucket by exporting the following environment variables using an [environment agent hook](/docs/agent/hooks) (this can not be set via the Buildkite web interface, API, or during pipeline upload):
+You can upload the [artifacts](/docs/builds/artifacts) created by your builds to your own [Google Cloud Storage](https://cloud.google.com/storage) bucket. Configure the agent to target your bucket by exporting the following environment variables in an [environment agent hook](/docs/agent/hooks) (this can not be set via the Buildkite web interface, API, or during pipeline upload):
 
 ```shell
 export BUILDKITE_ARTIFACT_UPLOAD_DESTINATION="gs://my-bucket/$BUILDKITE_JOB_ID"
 ```
 
-You will need to make sure the agent has permission to create new objects. If running on Google Compute Engine or Google Container Engine you can grant Storage Write permission to the instance or cluster, or restrict access more specifically using [a service account](https://cloud.google.com/compute/docs/access/service-accounts).
+Make sure the agent has permission to create new objects. If it is running on Google Compute Engine or Google Container Engine you can grant Storage Write permission to the instance or cluster, or restrict access more specifically using [a service account](https://cloud.google.com/compute/docs/access/service-accounts).
